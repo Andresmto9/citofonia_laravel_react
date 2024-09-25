@@ -4,7 +4,7 @@ import {createRoot} from 'react-dom/client';
 export default function Prueba(){
     return (
         <>
-            <p>Hola mundo</p>
+            <p>Hola mundo :D</p>
         </>
     )
 }
