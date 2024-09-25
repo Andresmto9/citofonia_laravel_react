@@ -1,2 +1,3 @@
 import './bootstrap';
-import './Cosa';
+import './sweetalert';
+import './login';
