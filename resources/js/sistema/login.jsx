@@ -62,6 +62,8 @@ function handleSubmit(e) {
                     `,
                 });
             }else{
+                sessionStorage.removeItem("usua_id");
+                sessionStorage.setItem("usua_id", data.usua_id);
                 Cookies.set('cookie_token', data.token, { expires: 60 });
                 window.location.href = `${data.redirect_url}`;
             }
