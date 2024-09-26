@@ -1,6 +1,10 @@
+// Se realiza la importación de las dependencias para REACT
 import React from 'react';
 import {createRoot} from 'react-dom/client';
 
+/**
+ * Funcionalidad para renderizar el componenete usado en el login
+ */
 export default function RenderLogin(){
     return (
         <>
@@ -29,46 +33,44 @@ export default function RenderLogin(){
     )
 }
 
+/**
+ * Funcionalidad para realizar el envio de datos para el login y genereción del token usado en el sistema
+ *
+ * @param {event} e Recibe por parametro el evento del login
+ */
 function handleSubmit(e) {
     e.preventDefault();
 
+    // Declaración del formulario usado en el login, dando como formato FormData
     const form = e.target;
     const formData = new FormData(form);
 
+    // Da formato JSON al formulario del login
     const formJson = Object.fromEntries(formData.entries());
-    if(formJson.mailUsua == '' || formJson.passUsua == ''){
-        Swal.fire({
-            title: "¡UN MOMENTO!",
-            text: "Debe ingresar el correo y la contraseña",
-            icon: "info",
-            showCloseButton: false,
-            showCancelButton: false,
-            showConfirmButton: true,
-            focusConfirm: false,
-            confirmButtonText: `
-              OK
-            `,
-        });
-    }else{
-        fetch('/api/token', { method: form.method, body: formData })
-            .then((response) => response.json())
-            .then((data) => {
-                if(data.estado == false){
-                    Swal.fire({
-                        title: "¡UN MOMENTO!",
-                        text: data.errors[0],
-                        icon: "error",
-                        confirmButtonText: `
-                            OK
-                        `,
-                    });
-                }
-                console.log(data);
-            })
-            .catch((error) => console.log(error));
-    }
+
+    // Realiza la petición para ingresar y generar el token
+    fetch('/api/token', { method: form.method, body: formData })
+        .then((response) => response.json())
+        .then((data) => {
+            if(data.estado == false){
+                Swal.fire({
+                    title: "¡UN MOMENTO!",
+                    text: data.errors[0],
+                    icon: "error",
+                    confirmButtonText: `
+                        OK
+                    `,
+                });
+            }else{
+                Cookies.set('cookie_token', data.token, { expires: 60 });
+                window.location.href = `${data.redirect_url}`;
+            }
+        })
+        .catch((error) => console.log(error));
+
 }
 
+// Validata la existencia del contenido usado para el login
 if(document.getElementById('contentLogin')){
     createRoot(document.getElementById('contentLogin')).render(<RenderLogin/>)
 }

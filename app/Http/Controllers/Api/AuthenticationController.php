@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\UsuaRoleModel;
+use GuzzleHttp\Psr7\Response;
 
 class AuthenticationController extends Controller
 {
@@ -28,6 +30,12 @@ class AuthenticationController extends Controller
             ], 400);
         }
 
+        if(!Auth::attempt($request->only('email','password'))){
+            return response()->json([
+                'estado' => false,
+                'errors' => ['No autorizado']
+            ],401);
+        }
         $user = User::where('email', $request->email)->first();
         if($user != null){
             if (!Hash::check($request->password, $user->password)) {
@@ -37,30 +45,51 @@ class AuthenticationController extends Controller
                 ],401);
             }
 
-            return AuthenticationController::setTokenUsua($user->id, $user->createToken('API TOKEN')->plainTextToken);
+            $credetials = [
+                'email' => $request->email,
+                'password' => $request->password,
+            ];
+
+            if (Auth::attempt($credetials)) {
+                $user = Auth::user();
+                $token = $user->createToken('token')->plainTextToken;
+                $cookie = cookie('cookie_token', $token, 60 * 40);
+
+                $role = UsuaRoleModel::where('usua_id', $user->id)->first();
+
+                switch ($role->rol_id) {
+                    case 1:
+                        $url = url('/usuarios');
+                        break;
+
+                    case 2:
+                        $url = url('/empleados');
+                        break;
+
+                    case 3:
+                        $url = url('/residentes');
+                        break;
+                    
+                    default:
+                        # code...
+                        break;
+                }
+
+                return response()->json([
+                    'estado' => true,
+                    'token' => $token,
+                    'redirect_url' => $url,
+                ]);
+            }else{
+                return response()->json([
+                    'estado' => false,
+                    'errors' => ['No autorizado']
+                ],401);
+            }
         }else{
             return response()->json([
                 'estado' => false,
                 'errors' => ['Verifique las credenciales ingresadas.']
-            ],401);
-        }
-    }
-
-    /**
-     * Funcionalidad para actualizar el token generado en la tabla usuarios.
-     */
-    private function setTokenUsua($id, $token){
-        $token = User::where('id', $id)
-            ->update(['remember_token' => $token]);
-
-        if($token){
-            return response()->json([
-                'estado' => true,
-            ], 200);
-        }else{
-            return response()->json([
-                'estado' => false,
-                'errors' => ['No fue posible actualizar la credencial.']
             ],401);
         }
     }
