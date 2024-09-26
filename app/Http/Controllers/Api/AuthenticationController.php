@@ -17,6 +17,7 @@ class AuthenticationController extends Controller
      * Funcionalidad para generar el token de autenticación para el consumo de servicios dentro del aplicativo.
      */
     public function token(Request $request){
+        /** Validador de los parametros enviados **/
         $rules = [
             'email' => 'required|string|email',
             'password' => 'required|string',
@@ -29,7 +30,9 @@ class AuthenticationController extends Controller
                 'errors' => $validador->errors()->all()
             ], 400);
         }
+        /*****************************************/
 
+        /** Validación de la existencia del usuario dentro de la base de datos **/
         if(!Auth::attempt($request->only('email','password'))){
             return response()->json([
                 'estado' => false,
@@ -37,14 +40,20 @@ class AuthenticationController extends Controller
             ],401);
         }
         $user = User::where('email', $request->email)->first();
+        /*****************************************/
+
         if($user != null){
+
+            /** Validación de la contraseña encryptada mediante HASH **/
             if (!Hash::check($request->password, $user->password)) {
                 return response()->json([
                     'estado' => false,
                     'errors' => ['Verifique las credenciales ingresadas.']
                 ],401);
             }
+            /*****************************************/
 
+            /** Validación de que las credenciales sean correctas para la autenticación **/
             $credetials = [
                 'email' => $request->email,
                 'password' => $request->password,
@@ -78,6 +87,7 @@ class AuthenticationController extends Controller
                 return response()->json([
                     'estado' => true,
                     'token' => $token,
+                    'usua_id' => $user->id,
                     'redirect_url' => $url,
                 ]);
             }else{
@@ -86,6 +96,7 @@ class AuthenticationController extends Controller
                     'errors' => ['No autorizado']
                 ],401);
             }
+            /*****************************************/
         }else{
             return response()->json([
                 'estado' => false,

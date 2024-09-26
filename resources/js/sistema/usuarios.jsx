@@ -39,7 +39,7 @@ const UsuarioTable = () => {
         <div className='flex min-h-screen items-center justify-center bg-gray-100'>
             <div className="overflow-x-auto relative shadow-md sm:rounded-lg">
                 <div className='grid grid-cols-12'>
-                    <div className="col-end-13 col-span-2 mb-2">
+                    <div className="col-end-12 col-span-4 md:col-end-13 md:col-span-2 mb-2">
                         <button className="flex px-3 py-2 bg-blue-400 mr-1 text-white font-semibold rounded" id="btnCreaUsua" onClick={showFormUsuario}>
                             <span className="ml-1">Crear usuario</span>
                         </button>
@@ -108,7 +108,7 @@ const UsuarioTable = () => {
                                 <input type="password" id="password" name="password" className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-blue-500"/>
                             </div>
                             <div className="mb-4">
-                                <button type="submit" id="btnRegiUsua" className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full">Ingresar</button>
+                                <button type="submit" id="btnRegiUsua" className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full">Registrar</button>
                                 <button type="button" id="btnActuUsua" onClick={actualizarUsuarios} className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md py-2 px-4 w-full hidden">Actualizar</button>
                             </div>
                         </form>
@@ -124,6 +124,7 @@ const showFormUsuario = () => {
     $("#name").val("");
     $("#email").val("");
     $("#rol").val("");
+    $("#password").val("");
 
     $("#btnActuUsua").addClass('hidden');
     $("#btnRegiUsua").removeClass('hidden');
